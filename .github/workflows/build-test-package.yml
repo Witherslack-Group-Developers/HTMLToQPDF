@@ -53,6 +53,12 @@ jobs:
         with:
             dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
       # Add our private nuget package source - note this only runs once when the runner is new so ignore if it errors
       - name: Add our private nuget package source
         run: dotnet nuget add source https://nuget.pkg.github.com/Witherslack-Group-Developers/index.json -n github
@@ -109,6 +115,12 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
             dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
 
       - name: Pack
         run: dotnet pack ./HTMLToQPDF/HTMLToQPDF.csproj /p:Version=${{ needs.Version.outputs.packageVersion }} /p:PackageVersion=${{ needs.Version.outputs.packageVersion }} --configuration Release --no-restore
