@@ -122,6 +122,9 @@ jobs:
           ref: ${{ github.ref }}
           fetch-depth: 0
 
+      - name: Restore
+        run: dotnet restore ./HTMLToQPDF/HTMLToQPDF.csproj /property:Configuration=Release
+
       - name: Pack
         run: dotnet pack ./HTMLToQPDF/HTMLToQPDF.csproj /p:Version=${{ needs.Version.outputs.packageVersion }} /p:PackageVersion=${{ needs.Version.outputs.packageVersion }} --configuration Release --no-restore
 
