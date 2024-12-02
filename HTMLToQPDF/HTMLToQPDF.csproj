@@ -10,6 +10,7 @@
     <Description>Relorer.QuestPDF.HTML is an extension for QuestPDF that allows to generate PDF from HTML</Description>
     <PackageProjectUrl>https://github.com/Relorer/HTMLToQPDF</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageId>Relorer.QuestPDF.HTML.WG</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Relorer/HTMLToQPDF</RepositoryUrl>
     <PackageTags>pdf, file, export, generate, generation, tool, create, creation, render, document, format, quest, html, library, converter, open, source, free, standard, core</PackageTags>
