@@ -138,7 +138,7 @@ jobs:
         run: dotnet pack ./HTMLToQPDF/HTMLToQPDF.csproj /p:Version=${{ needs.Version.outputs.packageVersion }} /p:PackageVersion=${{ needs.Version.outputs.packageVersion }} --configuration Release --no-restore
 
       - name: Push
-        run: dotnet nuget push "./bin/Release/${{ env.PACKAGE_NAME }}.${{ needs.Version.outputs.packageVersion }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+        run: dotnet nuget push "HTMLToQPDF/bin/Release/${{ env.PACKAGE_NAME }}.${{ needs.Version.outputs.packageVersion }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
 
       - name: Self Hosted Runner Post Cleanup
         uses: TooMuch4U/actions-clean@v2.1
