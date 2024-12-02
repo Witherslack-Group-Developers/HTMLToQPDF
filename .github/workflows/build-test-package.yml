@@ -18,7 +18,7 @@ env:
 
 jobs:
   Version:
-    runs-on: [linux]
+    runs-on: [ubuntu-latest]
     
     environment: staging
 
@@ -40,7 +40,7 @@ jobs:
           log-paths: src/
 
   Build:
-    runs-on: [linux]
+    runs-on: [ubuntu-latest]
     
     environment: staging
       
@@ -69,7 +69,7 @@ jobs:
         run: dotnet build ./HTMLToQPDF/HTMLToQPDF.csproj /p:Version=${{ needs.Version.outputs.packageVersion }} --configuration Release --no-restore
   
   Test:
-    runs-on: [linux]
+    runs-on: [ubuntu-latest]
     
     environment: staging
     
@@ -95,7 +95,7 @@ jobs:
       #     fail-on-error: true
 
   Package:
-    runs-on: [linux]
+    runs-on: [ubuntu-latest]
 
     environment: staging
 
