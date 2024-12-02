@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using HTMLQuestPDF.Extensions;
 using HTMLToQPDF.Components;
+using HTMLToQPDF.Components.Styling;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
@@ -53,6 +54,7 @@ namespace HTMLQuestPDF.Components
             last.InnerHtml = last.InnerHtml.TrimEnd();
 
             container.Text(GetAction(lineNodes));
+            
         }
 
         private Action<TextDescriptor> GetAction(List<HtmlNode> nodes)
@@ -71,10 +73,11 @@ namespace HTMLQuestPDF.Components
                 {
                     var span = text.Span(node.InnerText);
                     GetTextSpanAction(node).Invoke(span);
+                    TextStyler.Style(span, node);
                 }
                 else if (node.IsBr())
                 {
-                    var span = text.Span("\n");
+                    TextSpanDescriptor span = text.Span("\n");
                     GetTextSpanAction(node).Invoke(span);
                 }
                 else
@@ -83,11 +86,14 @@ namespace HTMLQuestPDF.Components
                     {
                         var action = GetAction(item);
                         action(text);
+                        //TryStyle(span, node);
+
                     }
                 }
             };
         }
 
+     
         private TextSpanAction GetTextSpanAction(HtmlNode node)
         {
             return spanAction =>

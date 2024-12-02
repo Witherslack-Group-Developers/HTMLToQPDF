@@ -21,7 +21,15 @@ namespace HTMLQuestPDF.Components
         {
             if (!node.HasContent() || node.Name.ToLower() == "head") return;
 
-            container = ApplyStyles(container);
+            try
+            {
+                container = ApplyStyles(container);
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+                Console.WriteLine(msg);
+            }
 
             if (node.ChildNodes.Any())
             {
@@ -35,7 +43,17 @@ namespace HTMLQuestPDF.Components
 
         protected virtual IContainer ApplyStyles(IContainer container)
         {
-            return args.ContainerStyles.TryGetValue(node.Name.ToLower(), out var style) ? style(container) : container;
+            try
+            {
+                return args.ContainerStyles.TryGetValue(node.Name.ToLower(), out var style) ? style(container) : container;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+                Console.WriteLine(msg);
+            }
+
+            return container;
         }
 
         protected virtual void ComposeSingle(IContainer container)
