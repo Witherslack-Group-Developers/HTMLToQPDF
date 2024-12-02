@@ -122,6 +122,15 @@ jobs:
           ref: ${{ github.ref }}
           fetch-depth: 0
 
+      # Add our private nuget package source - note this only runs once when the runner is new so ignore if it errors
+      - name: Add our private nuget package source
+        run: dotnet nuget add source https://nuget.pkg.github.com/Witherslack-Group-Developers/index.json -n github
+        continue-on-error: true
+
+      # Update the private nuget package source runner credentials
+      - name: Update the private nuget package source runner credentials
+        run: dotnet nuget update source github --password ${{ secrets.GH_PAT }} --username wgautomaton --store-password-in-clear-text
+
       - name: Restore
         run: dotnet restore ./HTMLToQPDF/HTMLToQPDF.csproj /property:Configuration=Release
 
