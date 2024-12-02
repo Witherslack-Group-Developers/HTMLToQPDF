@@ -1,0 +1,129 @@
+name: Build, test and create nuget package
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/*
+    paths:
+      - .github/workflows/build-test-package.yml
+      - HTMLToQPDF/**
+
+  workflow_dispatch:
+
+env:
+  PACKAGE_NAME: Relorer.QuestPDF.HTML.WG
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  Version:
+    runs-on:
+      group: staging
+      labels: linux
+    
+    environment: staging
+
+    outputs:
+      packageVersion: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.7.1
+        with:
+          release-branch: main
+          log-paths: src/
+
+  Build:
+    runs-on:
+      group: staging
+      labels: linux
+    
+    environment: staging
+      
+    needs:
+      - Version
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Add our private nuget package source - note this only runs once when the runner is new so ignore if it errors
+      - name: Add our private nuget package source
+        run: dotnet nuget add source https://nuget.pkg.github.com/Witherslack-Group-Developers/index.json -n github
+        continue-on-error: true
+
+      # Update the private nuget package source runner credentials
+      - name: Update the private nuget package source runner credentials
+        run: dotnet nuget update source github --password ${{ secrets.GH_PAT }} --username wgautomaton --store-password-in-clear-text
+
+      - name: Restore
+        run: dotnet restore ./HTMLToQPDF/HTMLToQPDF.csproj /property:Configuration=Release
+      
+      - name: Build
+        run: dotnet build ./HTMLToQPDF/HTMLToQPDF.csproj /p:Version=${{ needs.Version.outputs.packageVersion }} --configuration Release --no-restore
+  
+  Test:
+    runs-on:
+      group: staging
+      labels: linux
+    
+    environment: staging
+    
+    needs:
+      - Build
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # - name: Run unit tests
+      #   run: dotnet test ./YoungPerson/API/tests/Link.YoungPerson.API.Application.UnitTests/Link.YoungPerson.API.Application.UnitTests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      # - name: Generate test report
+      #   uses: dorny/test-reporter@v1
+      #   if: always()
+      #   with:
+      #     name: Test Summary
+      #     path: "**/test-results.trx"
+      #     reporter: dotnet-trx
+      #     fail-on-error: true
+
+  Package:
+    runs-on:
+      group: staging
+      labels: linux
+
+    environment: staging
+
+    needs:
+      - Version
+      - Build
+      - Test
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Pack
+        run: dotnet pack ./HTMLToQPDF/HTMLToQPDF.csproj /p:Version=${{ needs.Version.outputs.packageVersion }} /p:PackageVersion=${{ needs.Version.outputs.packageVersion }} --configuration Release --no-restore
+
+      - name: Push
+        run: dotnet nuget push "HTMLToQPDF/HTMLToQPDF/bin/Release/${{ env.PACKAGE_NAME }}.${{ needs.Version.outputs.packageVersion }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+
+      - name: Self Hosted Runner Post Cleanup
+        uses: TooMuch4U/actions-clean@v2.1
+        if: ${{ always() }} # To ensure this step runs even when earlier steps fail
