@@ -3,7 +3,7 @@ name: Build, test and create nuget package
 on:
   push:
     branches:
-      - main
+      - master
       - develop
       - feature/*
     paths:
@@ -36,7 +36,7 @@ jobs:
         id: version
         uses: codacy/git-version@2.7.1
         with:
-          release-branch: main
+          release-branch: master
           log-paths: src/
 
   Build:
