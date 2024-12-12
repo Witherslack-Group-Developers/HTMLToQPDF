@@ -61,8 +61,8 @@ public class TextStyler
                 if (keyValue.Length != 2)
                     continue;
 
-                var key = keyValue[0];
-                var value = keyValue[1];
+                var key = (keyValue[0] ?? "").Trim();
+                var value = (keyValue[1] ?? "").Trim();
 
                 TextStyler.Style(node, span, key, value);
             }
