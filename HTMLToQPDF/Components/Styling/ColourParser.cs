@@ -23,6 +23,34 @@ public static class ColourParser
             if (value.StartsWith("#"))
                 return Color.FromHex(value);
 
+            if (value.StartsWith("rgba("))
+            {
+
+                var values = GetBetween(value, '(', ')');
+                var split = values.Split(",");
+
+                int.TryParse(split[0], out var r);
+                int.TryParse(split[1], out var g);
+                int.TryParse(split[2], out var b);
+                int.TryParse(split[3], out var a);
+
+                var ret = Color.FromARGB((byte)(a * 255), (byte)r, (byte)g, (byte)b);
+                return ret;
+            }
+            if (value.StartsWith("rgb("))
+            {
+
+                var values = GetBetween(value, '(', ')');
+                var split = values.Split(",");
+
+                int.TryParse(split[0], out var r);
+                int.TryParse(split[1], out var g);
+                int.TryParse(split[2], out var b);
+
+                var ret = Color.FromARGB(255, (byte)r, (byte)g, (byte)b);
+                return ret;
+            }
+            
             if (CssColours.TryGetValue(value, out var colour))
             {
                 return colour;
@@ -37,6 +65,21 @@ public static class ColourParser
         return failToParseColour;
     }
 
+    public static string GetBetween(string input, char startChar, char endChar)
+    {
+        if (string.IsNullOrEmpty(input))
+            throw new ArgumentException("Input string cannot be null or empty.", nameof(input));
+
+        int startIndex = input.IndexOf(startChar);
+        if (startIndex == -1)
+            throw new ArgumentException($"Start character '{startChar}' not found in input string.", nameof(startChar));
+
+        int endIndex = input.IndexOf(endChar, startIndex + 1);
+        if (endIndex == -1)
+            throw new ArgumentException($"End character '{endChar}' not found in input string.", nameof(endChar));
+
+        return input.Substring(startIndex + 1, endIndex - startIndex - 1);
+    }
 
     private static readonly Dictionary<string, Color> CssColours = new(StringComparer.OrdinalIgnoreCase)
     {
