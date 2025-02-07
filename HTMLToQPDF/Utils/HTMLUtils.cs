@@ -9,14 +9,20 @@ namespace HTMLQuestPDF.Utils
 
         public static string PrepareHTML(string value)
         {
-            var result = HttpUtility.HtmlDecode(value);
+            var result = RemoveSpacesBetweenElements(value);
+            result = ReplaceNonBreakingSpaces(result);
+            result = HttpUtility.HtmlDecode(result);
             result = RemoveExtraSpacesAndBreaks(result);
             result = RemoveSpacesAroundBr(result);
             result = WrapSpacesAfterLineElement(result);
-            result = RemoveSpacesBetweenElements(result);
             return result;
         }
 
+        public static string ReplaceNonBreakingSpaces(string value)
+        {
+            var ret = value.Replace("&nbsp;", " ");
+            return ret;
+        }
         private static string RemoveExtraSpacesAndBreaks(string html)
         {
             return Regex.Replace(html, @"[ \r\n]+", " ");
